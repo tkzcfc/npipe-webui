@@ -629,7 +629,7 @@
                     <label for="newTunnelSource">源：</label>
                     <input type="text" id="newTunnelSource" placeholder="源">
                 </div>
-                <div class="form-group">
+                <div class="form-group" id="newTunnelEndpointGroup" style="display:none;">
                     <label for="newTunnelEndpoint">目标：</label>
                     <input type="text" id="newTunnelEndpoint" placeholder="目标">
                 </div>
@@ -643,10 +643,11 @@
                 </div>
                 <div class="form-group">
                     <label for="newTunnelType">类型：</label>
-                    <select id="newTunnelType" onchange="toggleSocks5Fields('new')">
+                    <select id="newTunnelType" onchange="toggleTunnelTypeFields('new')">
                         <option value="0">TCP</option>
                         <option value="1">UDP</option>
                         <option value="2">SOCKS5</option>
+                        <option value="3">HTTP</option>
                     </select>
                 </div>
                 <div class="form-group" id="newTunnelUsernameGroup" style="display:none;">
@@ -689,7 +690,7 @@
                     <label for="editTunnelSource">源：</label>
                     <input type="text" id="editTunnelSource" placeholder="源">
                 </div>
-                <div class="form-group">
+                <div class="form-group" id="editTunnelEndpointGroup" style="display:none;">
                     <label for="editTunnelEndpoint">目标：</label>
                     <input type="text" id="editTunnelEndpoint" placeholder="目标">
                 </div>
@@ -703,10 +704,11 @@
                 </div>
                 <div class="form-group">
                     <label for="editTunnelType">类型：</label>
-                    <select id="editTunnelType" onchange="toggleSocks5Fields('edit')">
+                    <select id="editTunnelType" onchange="toggleTunnelTypeFields('edit')">
                         <option value="0">TCP</option>
                         <option value="1">UDP</option>
                         <option value="2">SOCKS5</option>
+                        <option value="3">HTTP</option>
                     </select>
                 </div>
                 <div class="form-group" id="editTunnelUsernameGroup" style="display:none;">
@@ -871,7 +873,7 @@
                         <td data-label="ID">${tunnel.id}</td>
                         <td data-label="源">${tunnel.source}</td>
                         <td data-label="目标">${tunnel.endpoint}</td>
-                        <td data-label="类型">${['TCP', 'UDP', 'SOCKS5'][tunnel.tunnel_type]}</td>
+                        <td data-label="类型">${['TCP', 'UDP', 'SOCKS5', 'HTTP'][tunnel.tunnel_type]}</td>
                         <td data-label="发送者ID">${tunnel.sender}</td>
                         <td data-label="接收者ID">${tunnel.receiver}</td>
                         <td data-label="启用状态">
@@ -945,7 +947,7 @@
 
         function showAddTunnelModal() {
             document.getElementById('addTunnelModal').style.display = 'block';
-            toggleSocks5Fields('new');
+            toggleTunnelTypeFields('new');
         }
 
         function showEditTunnelModal(tunnel) {
@@ -961,7 +963,7 @@
             document.getElementById('editTunnelEncryption').value = tunnel.encryption_method;
             document.getElementById('editTunnelCompressed').checked = tunnel.is_compressed;
             document.getElementById('editTunnelModal').style.display = 'block';
-            toggleSocks5Fields('edit');
+            toggleTunnelTypeFields('edit');
         }
 
         function closeModal(modalId) {
@@ -1148,15 +1150,18 @@
             evt.currentTarget.className += " active";
         }
 
-        function toggleSocks5Fields(prefix) {
+        function toggleTunnelTypeFields(prefix) {
             const type = document.getElementById(prefix + 'TunnelType').value;
+            const endpointGroup = document.getElementById(prefix + 'TunnelEndpointGroup');
             const usernameGroup = document.getElementById(prefix + 'TunnelUsernameGroup');
             const passwordGroup = document.getElementById(prefix + 'TunnelPasswordGroup');
             
-            if (type === '2') { // SOCKS5
+            if (type === '2' || type === '3') { // SOCKS5 HTTP
+                endpointGroup.style.display = 'none';
                 usernameGroup.style.display = 'flex'; // 使用flex以保持一致的布局
                 passwordGroup.style.display = 'flex'; // 使用flex以保持一致的布局
             } else {
+                endpointGroup.style.display = 'flex'; // 使用flex以保持一致的布局
                 usernameGroup.style.display = 'none';
                 passwordGroup.style.display = 'none';
             }
